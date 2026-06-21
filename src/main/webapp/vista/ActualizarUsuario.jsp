@@ -19,9 +19,13 @@
             <label>Nuevo Nombre:</label>
             <input type="text" name="nombre" required>
         </div>
-        <div style="margin-bottom: 10px;">
+		<div style="margin-bottom: 10px;">
             <label>Nuevo Perfil:</label>
-            <input type="text" name="perfil" required>
+            <select name="perfil" required style="width: 100%; padding: 3px;">
+                <option value="" disabled selected>Seleccione una opción...</option>
+                <option value="Admin">Admin</option>
+                <option value="Empleado">Empleado</option>
+            </select>
         </div>
         
         <button type="submit">Guardar Cambios</button>

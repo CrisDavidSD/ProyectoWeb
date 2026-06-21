@@ -26,7 +26,11 @@
         </div>
         <div style="margin-bottom: 10px;">
             <label>Perfil (Rol):</label>
-            <input type="text" name="rol" required>
+            <select name="rol" required style="width: 100%; padding: 3px;">
+                <option value="" disabled selected>Seleccione una opción...</option>
+                <option value="Admin">Admin</option>
+                <option value="Empleado">Empleado</option>
+            </select>
         </div>
         
         <button type="submit">Guardar</button>
