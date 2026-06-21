@@ -9,7 +9,7 @@
     <h1>Eliminar Usuario</h1>
     <p>¿Está seguro de que desea eliminar este usuario del sistema?</p>
 
-	<form action="${pageContext.request.contextPath}/gestionarControlador" method="post">
+	<form action="./gestionarControlador" method="post">
         <input type="hidden" name="ruta" value="eliminarUsuario">
         
         <div style="margin-bottom: 10px;">
@@ -18,7 +18,7 @@
         </div>
         
         <button type="submit" style="color: red;">Confirmar Eliminación</button>
-		<a href="${pageContext.request.contextPath}/gestionarControlador?ruta=ingresar">Cancelar</a>
+		<a href="./gestionarControlador?ruta=ingresar">Cancelar</a>
     </form>
 </body>
 </html>

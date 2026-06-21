@@ -8,7 +8,7 @@
 <body>
     <h1>Actualizar Usuario</h1>
 
-	<form action="${pageContext.request.contextPath}/gestionarControlador" method="post">
+	<form action="./gestionarControlador" method="post">
         <input type="hidden" name="ruta" value="actualizarUsuario">
         
         <div style="margin-bottom: 10px;">
@@ -29,7 +29,7 @@
         </div>
         
         <button type="submit">Guardar Cambios</button>
-		<a href="${pageContext.request.contextPath}/gestionarControlador?ruta=ingresar">Cancelar</a>
+		<a href="./gestionarControlador?ruta=ingresar">Cancelar</a>
     </form>
 </body>
 </html>
