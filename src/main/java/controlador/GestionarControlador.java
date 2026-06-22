@@ -130,8 +130,4 @@ public class GestionarControlador extends HttpServlet {
 
 		resp.sendRedirect("gestionarControlador?ruta=ingresar");
 	}
-
-	private void entrar(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		resp.sendRedirect("vista/login.jsp");
-	}
 }
