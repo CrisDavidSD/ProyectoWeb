@@ -9,9 +9,8 @@ public class Usuario implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String nombre;
 	private String correo;
-	private String perfil; // Corregido de 'perfi' a 'perfil' según diagramas
+	private String perfil; 
 
-	// Lista estática para simular la base de datos y que los flujos funcionen
 	private static List<Usuario> usuarios = new ArrayList<>();
 	
 	public Usuario() {
@@ -30,7 +29,6 @@ public class Usuario implements Serializable {
 	public String getPerfil() { return perfil; }
 	public void setPerfil(String perfil) { this.perfil = perfil; }
 
-	// --- Métodos fieles al DSD (Diagrama de Secuencia de Diseño) ---
 
 	public List<Usuario> getAll() {
 		return usuarios;
@@ -39,19 +37,16 @@ public class Usuario implements Serializable {
 	public boolean validarcorreo(String correo) {
 		for (Usuario u : usuarios) {
 			if (u.getCorreo().equals(correo)) {
-				return true; // Simula el retorno duplicado() del DSD
+				return true; 
 			}
 		}
 		return false;
 	}
 
-	// El DSD especifica los parámetros (nombre: String, correo: String, rol: String)
-	public void saveuser(String nombre, String correo, String rol) {
-		Usuario nuevoUsuario = new Usuario(nombre, correo, rol);
-		usuarios.add(nuevoUsuario); // Simula el retorno usuarioguardado() del DSD
+	public void saveuser(String nombre, String correo, String perfil) {
+		Usuario nuevoUsuario = new Usuario(nombre, correo, perfil);
+		usuarios.add(nuevoUsuario); 
 	}
-
-	// --- Métodos fieles al Diagrama de Robustez (CRUD faltante en DSD) ---
 
 	public void actualizarUsuario(String nombre, String correo, String perfil) {
 		for (Usuario u : usuarios) {
