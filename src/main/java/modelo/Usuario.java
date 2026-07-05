@@ -5,60 +5,144 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Usuario implements Serializable {
-	
 	private static final long serialVersionUID = 1L;
-	private String nombre;
-	private String correo;
-	private String perfil; 
 
-	private static List<Usuario> usuarios = new ArrayList<>();
-	
+	private int id;
+	private String nombre;
+	private String clave;
+	private boolean isAdmin;
+
+	private static List<Usuario> usuarios = null;
+
 	public Usuario() {
 	}
-	
-	public Usuario(String nombre, String correo, String perfil) {
+
+	public Usuario(int id, String nombre, String clave, boolean isAdmin) {
+		super();
+		this.id = id;
 		this.nombre = nombre;
-		this.correo = correo;
-		this.perfil = perfil;
+		this.clave = clave;
+		this.isAdmin = isAdmin;
 	}
 
-	public String getNombre() { return nombre; }
-	public void setNombre(String nombre) { this.nombre = nombre; }
-	public String getCorreo() { return correo; }
-	public void setCorreo(String correo) { this.correo = correo; }
-	public String getPerfil() { return perfil; }
-	public void setPerfil(String perfil) { this.perfil = perfil; }
-
-
-	public List<Usuario> getAll() {
-		return usuarios;
+	public int getId() {
+		return id;
 	}
 
-	public boolean validarcorreo(String correo) {
-		for (Usuario u : usuarios) {
-			if (u.getCorreo().equals(correo)) {
-				return true; 
-			}
-		}
-		return false;
+	public void setId(int id) {
+		this.id = id;
 	}
 
-	public void saveuser(String nombre, String correo, String perfil) {
-		Usuario nuevoUsuario = new Usuario(nombre, correo, perfil);
-		usuarios.add(nuevoUsuario); 
+	public String getNombre() {
+		return nombre;
 	}
 
-	public void actualizarUsuario(String nombre, String correo, String perfil) {
-		for (Usuario u : usuarios) {
-			if (u.getCorreo().equals(correo)) {
-				u.setNombre(nombre);
-				u.setPerfil(perfil);
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public String getClave() {
+		return clave;
+	}
+
+	public void setClave(String clave) {
+		this.clave = clave;
+	}
+
+	public boolean isAdmin() {
+		return isAdmin;
+	}
+
+	public void setAdmin(boolean isAdmin) {
+		this.isAdmin = isAdmin;
+	}
+
+	/*------------------------------------*/
+
+	public static Usuario authenticate(String username, String password) {
+
+		Usuario usuarioAutorizado = null;
+		List<Usuario> usuarios = getUsuarios();
+		for (Usuario usuario : usuarios) {
+			if (usuario.getNombre().equals(username) && usuario.getClave().equals(password)) {
+
+				usuarioAutorizado = usuario;
 				break;
 			}
 		}
+
+		return usuarioAutorizado;
 	}
 
-	public void eliminarUsuario(String correo) {
-		usuarios.removeIf(u -> u.getCorreo().equals(correo));
+	public static List<Usuario> getUsuarios() {
+		if (usuarios == null) {
+			usuarios = new ArrayList<Usuario>();
+			usuarios.add(new Usuario(1, "admin", "admin", true));
+			usuarios.add(new Usuario(2, "user", "user", false));
+		}
+		return usuarios;
 	}
+
+	public static Usuario getUsuarioById(int idUsuario) {
+		for (Usuario usuario : getUsuarios()) {
+			if (usuario.getId() == idUsuario) {
+				return usuario;
+			}
+		}
+		return null;
+	}
+
+	public static boolean create(Usuario usuario) {
+		int max = 0;
+
+		for (Usuario u : getUsuarios()) {
+			if (u.getId() > max) {
+				max = u.getId();
+			}
+		}
+
+		max = max + 1;
+		usuario.setId(max);
+		getUsuarios().add(usuario);
+
+		return true;
+	}
+
+	public static boolean update(Usuario usuario) {
+		List<Usuario> listaUsuarios = getUsuarios();
+
+		for (int i = 0; i < listaUsuarios.size(); i++) {
+			if (listaUsuarios.get(i).getId() == usuario.getId()) {
+				listaUsuarios.get(i).setClave(usuario.getClave());
+				listaUsuarios.get(i).setNombre(usuario.getNombre());
+
+				break;
+			}
+		}
+
+		return true;
+	}
+
+	public static boolean delete(int idUsuario) throws Exception {
+		Usuario usuarioEncontrado = getUsuarioById(idUsuario);
+		if (usuarioEncontrado.isAdmin) {
+			throw new Exception("Lo siento: Un administrador no puede ser eliminado");
+		} else {
+			int indice = 0;
+			List<Usuario> listaUsuarios = getUsuarios();
+			for (int i = 0; i < listaUsuarios.size(); i++) {
+				if (listaUsuarios.get(i).getId() == idUsuario) {
+					indice = i;
+					break;
+				}
+			}
+
+			listaUsuarios.remove(indice);
+
+		}
+
+		return true;
+
+	}
+
 }
