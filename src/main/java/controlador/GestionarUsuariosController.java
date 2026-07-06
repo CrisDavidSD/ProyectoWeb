@@ -54,7 +54,6 @@ public class GestionarUsuariosController extends HttpServlet {
 		List<Usuario> personas = Usuario.getUsuarios();
 		req.setAttribute("personas", personas);
 		req.getRequestDispatcher("jsp/listarusuarios.jsp").forward(req, resp);
-
 	}
 
 	private void nuevo(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -63,57 +62,85 @@ public class GestionarUsuariosController extends HttpServlet {
 	}
 
 	private void guardarNuevo(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String nombre = req.getParameter("txtNombre");
-		String clave = req.getParameter("txtClave");
-		Usuario usuario = new Usuario(0, nombre, clave, false);
+		String nombre = req.getParameter("Nombre");
+		String clave = req.getParameter("Clave");
+		String correo = req.getParameter("Correo");
+		String rolParam = req.getParameter("Rol");
+		boolean rol = (rolParam != null); 
+		
+		Usuario usuario = new Usuario(0, nombre, clave, rol, correo);
 		boolean resultado = Usuario.create(usuario);
 		if (resultado) {
 			resp.sendRedirect("GestionarUsuariosController?ruta=listar");
 		} else {
-			req.setAttribute("mensaje", "No se pudo ingresar el usuario nuevo");
-			req.getRequestDispatcher("jsp/error.jsp").forward(req, resp);
+			req.getSession().setAttribute("mensajeError", "Ya existe un usuario con el mismo correo.");
+			req.getRequestDispatcher("GestionarUsuariosController?ruta=nuevo").forward(req, resp);
 		}
-
 	}
 
 	private void actualizar(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		int idPersona = Integer.parseInt(req.getParameter("idpersona"));
 		Usuario persona = Usuario.getUsuarioById(idPersona);
-		// Aqui falta verificar que exista la persona, si no existe, redirigir a
-		// error.jsp
-		req.setAttribute("persona", persona);
-		req.getRequestDispatcher("jsp/actualizarusuario.jsp").forward(req, resp);
+		if (persona == null) {
+			req.setAttribute("mensajeError", "Persona no encontrada");
+			req.getRequestDispatcher("jsp/listarusuarios.jsp").forward(req, resp);
+		} else {
+			req.setAttribute("persona", persona);
+			req.getRequestDispatcher("jsp/actualizarusuario.jsp").forward(req, resp);
+		}
 	}
 
-	private void guardarExistente(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		int id = Integer.parseInt(req.getParameter("txtId"));
-		String nombre = req.getParameter("txtNombre");
-		String clave = req.getParameter("txtClave");
-		Usuario usuario = new Usuario(id, nombre, clave, false);
+	private void guardarExistente(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	    int id = Integer.parseInt(req.getParameter("Id"));
+	    String nombre = req.getParameter("Nombre");
+	    String clave = req.getParameter("Clave");
+	    String correo = req.getParameter("Correo"); 
+	    
+	    String rolParam = req.getParameter("Rol");  
+	    boolean rol = (rolParam != null); 
+	    
+	    Usuario usuario = new Usuario(id, nombre, clave, rol, correo);
 
-		boolean respuesta = Usuario.update(usuario);
+	    try {
+	        boolean respuesta = Usuario.update(usuario); 
 
-		if (respuesta) {
-			// Si la actualización fue exitosa, volver a la lista
-			resp.sendRedirect("GestionarUsuariosController?ruta=listar");
-		} else {
-			// En caso de error mostrar la página de error con mensaje
-			req.setAttribute("mensaje", "Error al actualizar el usuario con id: " + usuario.getId());
-			req.getRequestDispatcher("jsp/error.jsp").forward(req, resp);
-		}
+	        if (respuesta) {
+	            resp.sendRedirect("GestionarUsuariosController?ruta=listar");
+	        }
+	        
+	    } catch (Exception e) {
+	        // Guardamos el error en la SESIÓN
+	        if (e.getMessage().equals("CORREO_REPETIDO")) {
+	            req.getSession().setAttribute("mensajeError", "El correo está repetido.");
+	        } else if (e.getMessage().equals("ES_ADMINISTRADOR")) {
+	            req.getSession().setAttribute("mensajeError", "No puedes quitarle el rol a un Administrador.");
+	        }
+
+	        resp.sendRedirect("GestionarUsuariosController?ruta=actualizar&idpersona=" + id);
+	    }
 	}
 
 	private void eliminar(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		int idPersona = Integer.parseInt(req.getParameter("idpersona"));
-		try {
-			Usuario.delete(idPersona);
-			// 3 .- Llamar a la vista
-			resp.sendRedirect("GestionarUsuariosController?ruta=listar");
-		} catch (Exception ex) {
-			req.setAttribute("mensaje", ex.getMessage());
-			req.getRequestDispatcher("jsp/error.jsp").forward(req, resp);
-		}
+	    int idUsuario = Integer.parseInt(req.getParameter("idpersona"));
+	    
+	    try {
+	    	
+	    	boolean respuesta = Usuario.delete(idUsuario);
+	        
+	    	if(respuesta) {
+	    		resp.sendRedirect("GestionarUsuariosController?ruta=listar");
+	    	}
+	        
+	    } catch (Exception ex) {
+
+	        if (ex.getMessage().equals("USUARIO_NO_ENCONTRADO")) {
+	            req.getSession().setAttribute("mensajeError", "Error: El usuario que intentas eliminar no existe o ya fue borrado.");
+	        } else if (ex.getMessage().equals("ES_ADMINISTRADOR")) {
+	            req.getSession().setAttribute("mensajeError", "Lo siento: Un administrador no puede ser eliminado.");
+	        } 
+
+	        req.getRequestDispatcher("GestionarUsuariosController?ruta=listar").forward(req, resp);
+	    }
 	}
 
 }
