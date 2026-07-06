@@ -9,10 +9,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import modelo.Usuario;
+import modelo.UsuarioDAO;
+import modelo.UsuarioDAOImpl;
 
 @WebServlet("/AutenticarController")
 public class AutenticarController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -45,7 +48,7 @@ public class AutenticarController extends HttpServlet {
 		String usuario = req.getParameter("usuario");
 		String clave = req.getParameter("clave");
 
-		Usuario resultado = Usuario.authenticate(usuario, clave);
+		Usuario resultado = usuarioDAO.autenticar(usuario, clave);
 
 		if (resultado == null) {
 			resp.sendRedirect("jsp/login.jsp");

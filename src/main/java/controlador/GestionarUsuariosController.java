@@ -9,10 +9,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import modelo.Usuario;
+import modelo.UsuarioDAO;
+import modelo.UsuarioDAOImpl;
 
 @WebServlet("/GestionarUsuariosController")
 public class GestionarUsuariosController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -51,7 +54,7 @@ public class GestionarUsuariosController extends HttpServlet {
 
 	private void listar(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-		List<Usuario> personas = Usuario.getUsuarios();
+		List<Usuario> personas = usuarioDAO.obtenerTodos();
 		req.setAttribute("personas", personas);
 		req.getRequestDispatcher("jsp/listarusuarios.jsp").forward(req, resp);
 	}
@@ -69,7 +72,7 @@ public class GestionarUsuariosController extends HttpServlet {
 		boolean rol = (rolParam != null); 
 		
 		Usuario usuario = new Usuario(0, nombre, clave, rol, correo);
-		boolean resultado = Usuario.create(usuario);
+		boolean resultado = usuarioDAO.insertar(usuario);
 		if (resultado) {
 			resp.sendRedirect("GestionarUsuariosController?ruta=listar");
 		} else {
@@ -80,7 +83,7 @@ public class GestionarUsuariosController extends HttpServlet {
 
 	private void actualizar(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		int idPersona = Integer.parseInt(req.getParameter("idpersona"));
-		Usuario persona = Usuario.getUsuarioById(idPersona);
+		Usuario persona = usuarioDAO.buscarPorId(idPersona);
 		if (persona == null) {
 			req.setAttribute("mensajeError", "Persona no encontrada");
 			req.getRequestDispatcher("jsp/listarusuarios.jsp").forward(req, resp);
@@ -102,7 +105,7 @@ public class GestionarUsuariosController extends HttpServlet {
 	    Usuario usuario = new Usuario(id, nombre, clave, rol, correo);
 
 	    try {
-	        boolean respuesta = Usuario.update(usuario); 
+	        boolean respuesta = usuarioDAO.actualizar(usuario); 
 
 	        if (respuesta) {
 	            resp.sendRedirect("GestionarUsuariosController?ruta=listar");
@@ -125,7 +128,7 @@ public class GestionarUsuariosController extends HttpServlet {
 	    
 	    try {
 	    	
-	    	boolean respuesta = Usuario.delete(idUsuario);
+	    	boolean respuesta = usuarioDAO.eliminar(idUsuario);
 	        
 	    	if(respuesta) {
 	    		resp.sendRedirect("GestionarUsuariosController?ruta=listar");
