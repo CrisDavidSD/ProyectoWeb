@@ -56,11 +56,11 @@ public class GestionarUsuariosController extends HttpServlet {
 
 		List<Usuario> personas = usuarioDAO.obtenerTodos();
 		req.setAttribute("personas", personas);
-		req.getRequestDispatcher("jsp/listarusuarios.jsp").forward(req, resp);
+		req.getRequestDispatcher("/jsp/listarusuarios.jsp").forward(req, resp);
 	}
 
 	private void nuevo(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.sendRedirect("jsp/crearusuario.jsp");
+		resp.sendRedirect(req.getContextPath() + "/jsp/crearusuario.jsp");
 
 	}
 
@@ -74,10 +74,10 @@ public class GestionarUsuariosController extends HttpServlet {
 		Usuario usuario = new Usuario(0, nombre, clave, rol, correo);
 		boolean resultado = usuarioDAO.insertar(usuario);
 		if (resultado) {
-			resp.sendRedirect("GestionarUsuariosController?ruta=listar");
+			resp.sendRedirect(req.getContextPath() + "/GestionarUsuariosController?ruta=listar");
 		} else {
 			req.getSession().setAttribute("mensajeError", "Ya existe un usuario con el mismo correo.");
-			req.getRequestDispatcher("GestionarUsuariosController?ruta=nuevo").forward(req, resp);
+			resp.sendRedirect(req.getContextPath() + "/GestionarUsuariosController?ruta=nuevo");
 		}
 	}
 
@@ -86,10 +86,10 @@ public class GestionarUsuariosController extends HttpServlet {
 		Usuario persona = usuarioDAO.buscarPorId(idPersona);
 		if (persona == null) {
 			req.setAttribute("mensajeError", "Persona no encontrada");
-			req.getRequestDispatcher("jsp/listarusuarios.jsp").forward(req, resp);
+			req.getRequestDispatcher("/jsp/listarusuarios.jsp").forward(req, resp);
 		} else {
 			req.setAttribute("persona", persona);
-			req.getRequestDispatcher("jsp/actualizarusuario.jsp").forward(req, resp);
+			req.getRequestDispatcher("/jsp/actualizarusuario.jsp").forward(req, resp);
 		}
 	}
 
@@ -108,18 +108,17 @@ public class GestionarUsuariosController extends HttpServlet {
 	        boolean respuesta = usuarioDAO.actualizar(usuario); 
 
 	        if (respuesta) {
-	            resp.sendRedirect("GestionarUsuariosController?ruta=listar");
+	            resp.sendRedirect(req.getContextPath() + "/GestionarUsuariosController?ruta=listar");
 	        }
 	        
 	    } catch (Exception e) {
-	        // Guardamos el error en la SESIÓN
 	        if (e.getMessage().equals("CORREO_REPETIDO")) {
 	            req.getSession().setAttribute("mensajeError", "El correo está repetido.");
 	        } else if (e.getMessage().equals("ES_ADMINISTRADOR")) {
 	            req.getSession().setAttribute("mensajeError", "No puedes quitarle el rol a un Administrador.");
 	        }
 
-	        resp.sendRedirect("GestionarUsuariosController?ruta=actualizar&idpersona=" + id);
+	        resp.sendRedirect(req.getContextPath() + "/GestionarUsuariosController?ruta=actualizar&idpersona=" + id);
 	    }
 	}
 
@@ -131,7 +130,7 @@ public class GestionarUsuariosController extends HttpServlet {
 	    	boolean respuesta = usuarioDAO.eliminar(idUsuario);
 	        
 	    	if(respuesta) {
-	    		resp.sendRedirect("GestionarUsuariosController?ruta=listar");
+	    		resp.sendRedirect(req.getContextPath() + "/GestionarUsuariosController?ruta=listar");
 	    	}
 	        
 	    } catch (Exception ex) {
@@ -142,7 +141,7 @@ public class GestionarUsuariosController extends HttpServlet {
 	            req.getSession().setAttribute("mensajeError", "Lo siento: Un administrador no puede ser eliminado.");
 	        } 
 
-	        req.getRequestDispatcher("GestionarUsuariosController?ruta=listar").forward(req, resp);
+	        resp.sendRedirect(req.getContextPath() + "/GestionarUsuariosController?ruta=listar");
 	    }
 	}
 

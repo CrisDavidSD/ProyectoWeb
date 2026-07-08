@@ -40,7 +40,7 @@ public class AutenticarController extends HttpServlet {
 	}
 
 	private void iniciar(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.sendRedirect("jsp/login.jsp");
+		resp.sendRedirect(req.getContextPath() + "/jsp/login.jsp");
 
 	}
 
@@ -51,11 +51,11 @@ public class AutenticarController extends HttpServlet {
 		Usuario resultado = usuarioDAO.autenticar(usuario, clave);
 
 		if (resultado == null) {
-			resp.sendRedirect("jsp/login.jsp");
+			resp.sendRedirect(req.getContextPath() + "/jsp/login.jsp");
 		} else {
 			HttpSession sesionSitio = req.getSession();
 			sesionSitio.setAttribute("autorizado", resultado);
-			resp.sendRedirect("GestionarUsuariosController?ruta=listar");
+			resp.sendRedirect(req.getContextPath() + "/GestionarUsuariosController?ruta=listar");
 		}
 
 	}
